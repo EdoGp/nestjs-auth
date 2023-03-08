@@ -24,7 +24,6 @@ export class UsersController {
 
   @Get()
   findAll(@ActiveUser() user: ActiveUserData) {
-    console.log({ user });
     return this.usersService.findAll();
   }
 
