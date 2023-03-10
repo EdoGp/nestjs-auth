@@ -11,7 +11,7 @@ export class InvalidatedRefreshTokenError extends Error {}
 export class RefreshTokenIdsStorage
   implements OnApplicationBootstrap, OnApplicationShutdown
 {
-  private redisClient: Redis;
+  // private redisClient: Redis;
 
   onApplicationBootstrap() {
     // this.redisClient = new Redis({ host: 'localhost', port: 6379 });
