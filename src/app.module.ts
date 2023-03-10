@@ -11,7 +11,7 @@ import { UsersModule } from './users/users.module';
     ConfigModule.forRoot(),
     UsersModule,
     IamModule,
-    MongooseModule.forRoot('mongodb://localhost:27017/nest-course'),
+    MongooseModule.forRoot(process.env.MONGO_URL),
   ],
   controllers: [AppController],
   providers: [AppService],
