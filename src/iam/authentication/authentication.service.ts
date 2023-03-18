@@ -40,7 +40,7 @@ export class AuthenticationService {
         email: signUpDto.email,
         password: hashedPassword,
       });
-      return user;
+      return await this.generateTokens(user);
     } catch (error) {
       const mongoUniqueKeyErrorValidation = 11000;
       if (error.code === mongoUniqueKeyErrorValidation) {
