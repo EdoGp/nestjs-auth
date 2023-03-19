@@ -1,7 +1,7 @@
 import { ValidationPipe } from '@nestjs/common';
 import { NestFactory } from '@nestjs/core';
 import * as cookieParser from 'cookie-parser';
-import helmet from 'helmet';
+// import helmet from 'helmet';
 import { AppModule } from './app.module';
 import { HttpExceptionFilter } from './common/Filters/httpException.filter';
 import { ControllerLoggingInterceptor } from './common/interceptors/controller-logging.interceptor';
@@ -20,8 +20,8 @@ async function bootstrap() {
     new WrapResponseInterceptor(),
     new ControllerLoggingInterceptor(new CustomLogger()),
   );
-  app.enableCors();
-  app.use(helmet());
+  // app.enableCors();
+  // app.use(helmet());
   await app.listen(process.env.PORT || 4000);
 }
 bootstrap();
