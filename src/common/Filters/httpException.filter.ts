@@ -16,8 +16,9 @@ export class HttpExceptionFilter implements ExceptionFilter {
     const status = exception.getStatus();
     const { method, body, params, query, url, cookies } = host.getArgByIndex(0);
     this.logger.verbose(
-      `[INC][${method}] ${url}
-      ${Object.keys(body).length ? ` [BODY] ${JSON.stringify(body)}` : ''}${
+      `[INC][${method}] ${url}${
+        Object.keys(cookies).length ? ' [COOKIES][✓]' : ''
+      }${Object.keys(body).length ? ` [BODY] ${JSON.stringify(body)}` : ''}${
         Object.keys(params).length ? ` [PARAMS] ${JSON.stringify(params)}` : ''
       }${Object.keys(query).length ? ` [QUERY] ${JSON.stringify(query)}` : ''}`,
     );
