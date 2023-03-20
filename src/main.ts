@@ -1,6 +1,6 @@
 import { ValidationPipe } from '@nestjs/common';
 import { NestFactory } from '@nestjs/core';
-import * as cookieParser from 'cookie-parser';
+// import * as cookieParser from 'cookie-parser';
 // import helmet from 'helmet';
 import { AppModule } from './app.module';
 import { HttpExceptionFilter } from './common/Filters/httpException.filter';
@@ -13,7 +13,7 @@ async function bootstrap() {
   const app = await NestFactory.create(AppModule, {
     logger: ['log', 'error', 'warn', 'debug', 'verbose'],
   });
-  app.use(cookieParser());
+  // app.use(cookieParser());
   app.useGlobalFilters(new HttpExceptionFilter(new CustomLogger()));
   app.useGlobalPipes(new ValidationPipe());
   app.useGlobalInterceptors(
