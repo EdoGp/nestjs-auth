@@ -4,7 +4,7 @@ import { Injectable } from '@nestjs/common';
 export class AppService {
   #startTime;
   constructor() {
-    this.#startTime = Date.now();
+    this.#startTime = new Date().toISOString();
   }
 
   getStatus(): object {
