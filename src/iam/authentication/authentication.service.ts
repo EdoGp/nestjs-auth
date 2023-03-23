@@ -52,7 +52,7 @@ export class AuthenticationService {
   }
 
   async signIn(signInDto: SignInDto) {
-    const user = await this.userModel.findOne({ email: signInDto.email });
+    const user = await this.userModel.findOne({ email: signInDto.username });
     if (!user) {
       throw new UnauthorizedException('User does not exists');
     }

@@ -1,6 +1,6 @@
 import { ValidationPipe } from '@nestjs/common';
 import { NestFactory } from '@nestjs/core';
-import cookieParser from 'cookie-parser';
+import * as cookieParser from 'cookie-parser';
 import helmet from 'helmet';
 import { AppModule } from './app.module';
 import { HttpExceptionFilter } from './common/Filters/httpException.filter';
@@ -20,7 +20,11 @@ async function bootstrap() {
     new WrapResponseInterceptor(),
     new ControllerLoggingInterceptor(new CustomLogger()),
   );
-  app.enableCors();
+  app.enableCors({
+    origin: ['http://localhost:3000/', 'http://localhost:3000'],
+    methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
+    credentials: true,
+  });
   app.use(helmet());
   await app.listen(process.env.PORT || 4000);
 }
