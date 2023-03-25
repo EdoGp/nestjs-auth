@@ -12,7 +12,7 @@ export class AppController {
     return this.appService.getStatus();
   }
 
-  @Options('*')
+  @Options('/*')
   options(): object {
     return this.appService.getStatus();
   }

@@ -21,8 +21,10 @@ async function bootstrap() {
     new ControllerLoggingInterceptor(new CustomLogger()),
   );
   app.enableCors({
+    allowedHeaders: '*',
     origin: '*',
     credentials: true,
+    optionsSuccessStatus: 200,
   });
   app.use(helmet());
   await app.listen(process.env.PORT || 4000);
