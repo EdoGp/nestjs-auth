@@ -20,8 +20,11 @@ async function bootstrap() {
     new WrapResponseInterceptor(),
     new ControllerLoggingInterceptor(new CustomLogger()),
   );
+  const corsURLs = process.env.BASE_URL.split(',')
+    .map((url) => [url.trim(), url.trim() + '/'])
+    .flat();
   app.enableCors({
-    origin: [process.env.BASE_URL, process.env.BASE_URL + '/'],
+    origin: corsURLs,
     methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
     credentials: true,
   });
