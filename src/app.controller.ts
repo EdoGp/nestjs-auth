@@ -1,4 +1,4 @@
-import { Controller, Get, Options } from '@nestjs/common';
+import { Controller, Get } from '@nestjs/common';
 import { AppService } from './app.service';
 import { Auth } from './iam/authentication/decorators/auth.decorator';
 import { AuthType } from './iam/authentication/enums/auth-type.enum';
@@ -9,11 +9,6 @@ export class AppController {
 
   @Get()
   getStatus(): object {
-    return this.appService.getStatus();
-  }
-
-  @Options('/*')
-  options(): object {
     return this.appService.getStatus();
   }
 }
