@@ -20,11 +20,12 @@ async function bootstrap() {
     new WrapResponseInterceptor(),
     new ControllerLoggingInterceptor(new CustomLogger()),
   );
+  const corsURLs = process.env.BASE_URL.split(',')
+    .map((url) => [url.trim(), url.trim() + '/'])
+    .flat();
   app.enableCors({
-    allowedHeaders: '*',
-    origin: '*',
+    origin: corsURLs,
     credentials: true,
-    optionsSuccessStatus: 200,
   });
   app.use(helmet());
   await app.listen(process.env.PORT || 4000);
