@@ -20,9 +20,6 @@ async function bootstrap() {
     new WrapResponseInterceptor(),
     new ControllerLoggingInterceptor(new CustomLogger()),
   );
-  app.enableCors({
-    origin: '*',
-  });
   app.use(helmet());
   await app.listen(process.env.PORT || 4000);
 }
