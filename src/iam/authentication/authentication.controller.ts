@@ -34,12 +34,10 @@ export class AuthenticationController {
     response.cookie('accessToken', responseTokens.accessToken, {
       secure: true,
       httpOnly: true,
-      sameSite: true,
     });
     response.cookie('refreshToken', responseTokens.refreshToken, {
       secure: true,
       httpOnly: true,
-      sameSite: true,
     });
 
     return responseTokens;
