@@ -31,11 +31,16 @@ export class AuthenticationController {
     @Body() signInDto: SignInDto,
   ) {
     const responseTokens = await this.authService.signIn(signInDto);
-    // response.cookie('accessToken', responseTokens.accessToken, {
-    //   secure: true,
-    //   httpOnly: true,
-    //   sameSite: true,
-    // });
+    response.cookie('accessToken', responseTokens.accessToken, {
+      secure: true,
+      httpOnly: true,
+      sameSite: true,
+    });
+    response.cookie('refreshToken', responseTokens.refreshToken, {
+      secure: true,
+      httpOnly: true,
+      sameSite: true,
+    });
 
     return responseTokens;
   }
