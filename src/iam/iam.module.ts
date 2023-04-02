@@ -8,26 +8,13 @@ import { AuthenticationController } from './authentication/authentication.contro
 import { AuthenticationService } from './authentication/authentication.service';
 import { AccessTokenGuard } from './authentication/guards/access-token.guard';
 import { AuthenticationGuard } from './authentication/guards/authentication.guard';
+import { RefreshTokenGuard } from './authentication/guards/refresh-token.guard';
 import { RefreshTokenIdsStorage } from './authentication/refresh-token-ids.storage';
 import jwtConfig from './config/jwt.config';
 import { Argon2Service } from './hashing/argon2.service';
 import { HashingService } from './hashing/hashing.service';
 
 @Module({
-  providers: [
-    { provide: HashingService, useClass: Argon2Service },
-    {
-      provide: APP_GUARD,
-      useClass: AuthenticationGuard,
-    },
-    // {
-    //   provide: APP_GUARD,
-    //   useClass: AccessTokenGuard,
-    // },
-    AccessTokenGuard,
-    RefreshTokenIdsStorage,
-    AuthenticationService,
-  ],
   imports: [
     MongooseModule.forFeature([
       {
@@ -38,6 +25,18 @@ import { HashingService } from './hashing/hashing.service';
     JwtModule.registerAsync(jwtConfig.asProvider()),
     ConfigModule.forFeature(jwtConfig),
   ],
+  providers: [
+    { provide: HashingService, useClass: Argon2Service },
+    {
+      provide: APP_GUARD,
+      useClass: AuthenticationGuard,
+    },
+    AccessTokenGuard,
+    RefreshTokenGuard,
+    RefreshTokenIdsStorage,
+    AuthenticationService,
+  ],
+
   controllers: [AuthenticationController],
 })
 export class IamModule {}

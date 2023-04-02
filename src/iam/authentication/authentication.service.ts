@@ -2,12 +2,14 @@ import {
   ConflictException,
   Inject,
   Injectable,
+  InternalServerErrorException,
   UnauthorizedException,
 } from '@nestjs/common';
 import { ConfigType } from '@nestjs/config';
 import { JwtService } from '@nestjs/jwt';
 import { InjectModel } from '@nestjs/mongoose';
 import { randomUUID } from 'crypto';
+import { Response } from 'express';
 import { Model } from 'mongoose';
 import { User } from 'src/users/entities/user.entity';
 import jwtConfig from '../config/jwt.config';
@@ -23,12 +25,14 @@ import {
 
 @Injectable()
 export class AuthenticationService {
+  accessTokenMaxAge: number = 1000 * 60 * 60 * 24 * 2; // 2 days
+  refreshTokenMaxAge: number = 1000 * 60 * 60 * 24 * 30; // 30 days;
   constructor(
     @InjectModel(User.name)
     private readonly userModel: Model<User>,
     private readonly hashingService: HashingService,
     private readonly jwtService: JwtService,
-    @Inject(jwtConfig.KEY) // 👈
+    @Inject(jwtConfig.KEY)
     private readonly jwtConfiguration: ConfigType<typeof jwtConfig>,
     private readonly refreshTokenIdsStorage: RefreshTokenIdsStorage,
   ) {}
@@ -46,8 +50,7 @@ export class AuthenticationService {
       if (error.code === mongoUniqueKeyErrorValidation) {
         throw new ConflictException('Email already in use');
       }
-      // throw new InternalServerErrorException();
-      throw error;
+      throw new InternalServerErrorException(error);
     }
   }
 
@@ -111,6 +114,24 @@ export class AuthenticationService {
       }
       throw new UnauthorizedException();
     }
+  }
+
+  async setCookieTokens(
+    response: Response,
+    tokens: { accessToken: string; refreshToken: string },
+  ) {
+    response.cookie('refreshToken', tokens.refreshToken, {
+      httpOnly: true,
+      secure: true,
+      sameSite: 'none',
+      maxAge: this.refreshTokenMaxAge,
+    });
+    response.cookie('accessToken', tokens.accessToken, {
+      httpOnly: true,
+      secure: true,
+      sameSite: 'none',
+      maxAge: this.accessTokenMaxAge,
+    });
   }
 
   private async signToken<T>(userId: string, expiresIn: number, payload?: T) {

@@ -12,7 +12,7 @@ import jwtConfig from './../../config/jwt.config';
 import { REQUEST_USER_KEY } from './../../iam.constants';
 
 @Injectable()
-export class AccessTokenGuard implements CanActivate {
+export class RefreshTokenGuard implements CanActivate {
   constructor(
     private readonly jwtService: JwtService,
     @Inject(jwtConfig.KEY)
@@ -39,11 +39,12 @@ export class AccessTokenGuard implements CanActivate {
 
   private extractTokenFromHeader(request: Request): string | undefined {
     const cookies = request.headers.cookie?.split(';') ?? [];
-    const accessTokenCookie = cookies.find((cookie) => {
-      return cookie.trim().startsWith('accessToken=');
+    const refreshTokenCookie = cookies.find((cookie) => {
+      return cookie.trim().startsWith('refreshToken=');
     });
-    const accessToken = accessTokenCookie?.split('=')[1];
+    const refreshToken = refreshTokenCookie?.split('=')[1];
     const [_, token] = request.headers.authorization?.split(' ') ?? [];
-    return accessToken || token;
+    console.log({ refreshToken, token, refreshTokenCookie });
+    return refreshToken || token;
   }
 }

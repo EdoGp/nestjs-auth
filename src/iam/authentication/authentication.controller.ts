@@ -9,6 +9,7 @@ import {
 import { Response } from 'express';
 import { AuthenticationService } from './authentication.service';
 import { Auth } from './decorators/auth.decorator';
+import { Cookies } from './decorators/cookies';
 import { RefreshTokenDto } from './dto/refresh-token.dto';
 import { SignInDto } from './dto/sign-in.dto';
 import { SignUpDto } from './dto/sign-up.dto';
@@ -31,21 +32,24 @@ export class AuthenticationController {
     @Body() signInDto: SignInDto,
   ) {
     const responseTokens = await this.authService.signIn(signInDto);
-    response.cookie('accessToken', responseTokens.accessToken, {
-      secure: true,
-      httpOnly: true,
-    });
-    response.cookie('refreshToken', responseTokens.refreshToken, {
-      secure: true,
-      httpOnly: true,
-    });
-
+    this.authService.setCookieTokens(response, responseTokens);
     return responseTokens;
   }
 
   @HttpCode(HttpStatus.OK)
   @Post('refresh-tokens')
-  refreshTokens(@Body() refreshTokenDto: RefreshTokenDto) {
-    return this.authService.refreshTokens(refreshTokenDto);
+  async refreshTokens(
+    @Body() refreshTokenDto: RefreshTokenDto,
+    @Cookies('refreshToken') refreshTokenCookie: string,
+    @Res({ passthrough: true }) response: Response,
+  ) {
+    const refreshToken: RefreshTokenDto = refreshTokenDto.refreshToken
+      ? refreshTokenDto
+      : {
+          refreshToken: refreshTokenCookie,
+        };
+    const responseTokens = await this.authService.refreshTokens(refreshToken);
+    this.authService.setCookieTokens(response, responseTokens);
+    return responseTokens;
   }
 }
