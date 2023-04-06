@@ -40,7 +40,8 @@ export class CommonQueryDTO<T> {
       value,
       obj: { page = 1, limit = 0 },
     } = params;
-    const offset = value + limit * (page - 1);
+
+    const offset = Number(value) + Number(limit) * (Number(page) - 1);
     return offset;
   })
   offset: number = this.limit * (this.page - 1);

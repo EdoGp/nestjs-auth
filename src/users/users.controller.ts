@@ -40,12 +40,12 @@ export class UsersController {
       s,
       limit = 20,
       page = 1,
-      offset: skip,
+      offset: skip = 0,
     } = commonQuery;
     const items: User[] = await this.usersService.findMany(
       s,
       Object.keys(select).length ? select : { password: 0, __v: 0 },
-      { sort, limit, skip: skip + limit * (page - 1) },
+      { sort, limit, skip: (Number(skip) + Number(limit)) * (page - 1) },
     );
     const count: number = await this.usersService.countMany({});
     return { items, count };
