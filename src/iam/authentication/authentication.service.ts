@@ -74,7 +74,7 @@ export class AuthenticationService {
     const refreshTokenId = randomUUID();
     const [accessToken, refreshToken] = await Promise.all([
       this.signToken<Partial<ActiveUserData>>(
-        user.id,
+        user._id,
         this.jwtConfiguration.accessTokenTtl,
       ),
       this.signToken(user.id, this.jwtConfiguration.refreshTokenTtl, {
@@ -132,6 +132,10 @@ export class AuthenticationService {
       sameSite: 'none',
       maxAge: this.accessTokenMaxAge,
     });
+  }
+
+  async getProfile(userId: string) {
+    return this.userModel.findById(userId, { password: 0, __v: 0 });
   }
 
   private async signToken<T>(userId: string, expiresIn: number, payload?: T) {

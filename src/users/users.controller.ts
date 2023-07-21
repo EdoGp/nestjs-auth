@@ -13,7 +13,7 @@ import { ParseObjectIdPipePipe } from './../common/pipes/parse-object-id-pipe.pi
 import { ActiveUser } from './../iam/authentication/decorators/active-user.decorator';
 import { Auth } from './../iam/authentication/decorators/auth.decorator';
 import { AuthType } from './../iam/authentication/enums/auth-type.enum';
-import { ActiveUserData } from './../iam/interfaces/active-user-data.interface';
+import type { ActiveUserData } from './../iam/interfaces/active-user-data.interface';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { User } from './entities/user.entity';
@@ -51,12 +51,12 @@ export class UsersController {
     return { items, count };
   }
 
-  @Get(':id')
+  @Get('/:id')
   findOne(@Param('id', new ParseObjectIdPipePipe()) _id: string) {
     return this.usersService.findOne({ _id }, { password: 0, __v: 0, _id: 0 });
   }
 
-  @Put(':id')
+  @Put('/:id')
   update(
     @Param('id', new ParseObjectIdPipePipe()) id: string,
     @Body() updateUserDto: UpdateUserDto,
@@ -64,7 +64,7 @@ export class UsersController {
     return this.usersService.updateOneById(id, updateUserDto);
   }
 
-  @Delete(':id')
+  @Delete('/:id')
   remove(@Param('id', new ParseObjectIdPipePipe()) id: string) {
     return this.usersService.deleteById(id);
   }

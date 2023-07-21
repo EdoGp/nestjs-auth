@@ -13,6 +13,7 @@ export class HttpExceptionFilter implements ExceptionFilter {
   catch(exception: HttpException, host: ArgumentsHost) {
     const ctx = host.switchToHttp();
     const response = ctx.getResponse<Response>();
+    const exceptionResponse = exception.getResponse() as Record<string, string>;
     const status = exception.getStatus();
     const { method, body, params, query, url, cookies } = host.getArgByIndex(0);
     this.logger.verbose(
@@ -24,12 +25,13 @@ export class HttpExceptionFilter implements ExceptionFilter {
     );
     const now = Date.now();
     this.logger.verbose(
-      `[OUT][${method}][${exception.getStatus()}] ${url}  +${
-        Date.now() - now
-      }ms`,
+      `[OUT][${method}][${exception.getStatus()}] ${url} ${
+        exceptionResponse?.message
+      } ${exception?.message} +${Date.now() - now}ms`,
     );
-    response
-      .status(status)
-      .json({ statusCode: exception.getStatus(), message: exception.message });
+    response.status(status).json({
+      statusCode: exception.getStatus(),
+      message: exception.message || exceptionResponse.message,
+    });
   }
 }

@@ -1,13 +1,16 @@
 import {
   Body,
   Controller,
+  Get,
   HttpCode,
   HttpStatus,
   Post,
   Res,
 } from '@nestjs/common';
 import { Response } from 'express';
+import { ActiveUserData } from './../interfaces/active-user-data.interface';
 import { AuthenticationService } from './authentication.service';
+import { ActiveUser } from './decorators/active-user.decorator';
 import { Auth } from './decorators/auth.decorator';
 import { Cookies } from './decorators/cookies';
 import { RefreshTokenDto } from './dto/refresh-token.dto';
@@ -32,8 +35,14 @@ export class AuthenticationController {
     @Body() signInDto: SignInDto,
   ) {
     const responseTokens = await this.authService.signIn(signInDto);
-    this.authService.setCookieTokens(response, responseTokens);
+    // this.authService.setCookieTokens(response, responseTokens);
     return responseTokens;
+  }
+
+  @Auth(AuthType.Bearer)
+  @Get('/me')
+  async profile(@ActiveUser() { sub: userId }: ActiveUserData) {
+    return this.authService.getProfile(userId);
   }
 
   @HttpCode(HttpStatus.OK)
@@ -49,7 +58,7 @@ export class AuthenticationController {
           refreshToken: refreshTokenCookie,
         };
     const responseTokens = await this.authService.refreshTokens(refreshToken);
-    this.authService.setCookieTokens(response, responseTokens);
+    // this.authService.setCookieTokens(response, responseTokens);
     return responseTokens;
   }
 }
