@@ -39,6 +39,10 @@ export class AuthenticationService {
 
   async signUp(signUpDto: SignUpDto) {
     try {
+      const isNewUser = await this.userModel.exists({ email: signUpDto.email });
+      if (isNewUser) throw new ConflictException('Email already in use');
+      if (signUpDto.password !== signUpDto.passwordConfirmation)
+        throw new ConflictException('Passwords do not match');
       const hashedPassword = await this.hashingService.hash(signUpDto.password);
       const user = await this.userModel.create({
         email: signUpDto.email,
