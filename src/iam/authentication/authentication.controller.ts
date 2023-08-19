@@ -39,11 +39,6 @@ export class AuthenticationController {
     @Body() signInDto: SignInDto,
   ) {
     const responseTokens = await this.authService.signIn(signInDto);
-    this.commsService.sendMail({
-      to: 'annetudares@gmail.com',
-      subject: 'Mi Amor',
-      text: 'Hola te quiero mucho',
-    });
     // this.authService.setCookieTokens(response, responseTokens);
     return responseTokens;
   }

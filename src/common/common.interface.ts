@@ -1,5 +1,4 @@
-import { LoggerService } from '@nestjs/common';
-import { ObjectId, UpdateQuery } from 'mongoose';
+import { ObjectId } from 'mongoose';
 
 export interface CommonInterface {
   findOne<T>(
@@ -20,7 +19,7 @@ export interface CommonInterface {
   createOneOrMany<T>(item: Partial<T> | Partial<T[]>): Promise<T[] | T>;
   updateOneById<T>(
     _id: ObjectId,
-    item: UpdateQuery<T>,
+    item: Partial<T>,
     options: Record<string, unknown>,
   ): Promise<T>;
   deleteById(_id: ObjectId | string): Promise<void>;

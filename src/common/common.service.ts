@@ -154,11 +154,11 @@ export abstract class Service<T extends CommonSchema>
    */
   async updateOneById<T>(
     _id: ObjectId | string,
-    item: UpdateQuery<T>,
+    item: Partial<T>,
     options: Record<string, unknown> = {},
   ): Promise<T> {
     try {
-      const updatedItem = await this.model.findByIdAndUpdate(_id, item, {
+      const updatedItem = await this.model.findByIdAndUpdate<T>(_id, item, {
         new: true,
         useFindAndModify: false,
         ...options,
