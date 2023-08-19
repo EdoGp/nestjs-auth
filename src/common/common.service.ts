@@ -1,3 +1,4 @@
+import { CommonInterface } from './common.interface';
 import {
   ConflictException,
   InternalServerErrorException,
@@ -6,7 +7,9 @@ import {
 import { FilterQuery, Model, ObjectId, UpdateQuery } from 'mongoose';
 import { CommonSchema } from './Schemas/common.schema';
 
-export abstract class Service<T extends CommonSchema> {
+export abstract class Service<T extends CommonSchema>
+  implements CommonInterface
+{
   private readonly modelName: string;
   private readonly serviceLogger: LoggerService;
   /**
@@ -30,13 +33,14 @@ export abstract class Service<T extends CommonSchema> {
    * The constructor must receive the injected model from the child service in
    * order to provide all the proper base functionality.
    *
+   * @template { T } Model of the returned value
    * @param { T } conditions - The search conditions for the model
    * @param { string } projection - The projection conditions
    * for the return value.
    * @param { Record } options - The return value options
    * @returns { Promise<T> } Model - The instance of the model found
    */
-  async findOne(
+  async findOne<T>(
     conditions: Partial<Record<keyof T, unknown>>,
     projection: string | Record<string, unknown> = {},
     options: Record<string, any> = {},
@@ -61,6 +65,7 @@ export abstract class Service<T extends CommonSchema> {
    * The constructor must receive the injected model from the child service in
    * order to provide all the proper base functionality.
    *
+   * @template { T } Model of the returned value
    * @param { T } conditions - The search conditions for the model
    * @param { string } projection - The projection conditions
    * for the return value.
@@ -68,7 +73,7 @@ export abstract class Service<T extends CommonSchema> {
    * @returns { Promise<T[]> } Model array - An array of the models that match
    * the search parameters
    */
-  async findMany(
+  async findMany<T>(
     conditions: Partial<Record<keyof T, unknown>> = {},
     projection: string | Record<string, unknown> = {},
     options: Record<string, any> = {},
@@ -88,21 +93,20 @@ export abstract class Service<T extends CommonSchema> {
   /**
    * The constructor must receive the injected model from the child service in
    * order to provide all the proper base functionality.
-   *
+   * @template { T } Model of the returned value
    * @param { T } conditions - The search conditions for the model
    * @param { string } projection - The projection conditions
    * for the return value.
    * @param { Record } options - The return value options
    * @returns { Promise<number> } number - The number of items that match the search
    */
-  async countMany(
+  async countMany<T>(
     conditions: Partial<Record<keyof T, unknown>>,
-    projection: string | Record<string, unknown> = {},
     options: Record<string, unknown> = {},
   ): Promise<number> {
     try {
       return await this.model
-        .find(conditions as FilterQuery<T>, projection, options)
+        .find(conditions as FilterQuery<T>, options)
         .countDocuments();
     } catch (error) {
       this.serviceLogger.error(error);
@@ -111,10 +115,20 @@ export abstract class Service<T extends CommonSchema> {
     }
   }
 
-  async createOneOrMany(item: Partial<T> | Partial<T[]>): Promise<T> {
+  /**
+   * The constructor must receive the injected model from the child service in
+   * order to provide all the proper base functionality.
+   * @template { T } Model of the returned value
+   * @param { T } conditions - The search conditions for the model
+   * @param { string } projection - The projection conditions
+   * for the return value.
+   * @param { Record } options - The return value options
+   * @returns { Promise<number> } number - The number of items that match the search
+   */
+  async createOneOrMany<T>(item: Partial<T> | Partial<T[]>): Promise<T | T[]> {
     try {
-      const items: T = await this.model.create(item);
-      return items;
+      const items = await this.model.create(item);
+      return items as T | T[];
     } catch (error) {
       this.serviceLogger.error(error);
       if (error.code === 11000) {
@@ -128,17 +142,28 @@ export abstract class Service<T extends CommonSchema> {
     }
   }
 
-  async updateOneById(
-    _id: string,
+  /**
+   * The constructor must receive the injected model from the child service in
+   * order to provide all the proper base functionality.
+   * @template { T } Model of the returned value
+   * @param { T } conditions - The search conditions for the model
+   * @param { string } projection - The projection conditions
+   * for the return value.
+   * @param { Record } options - The return value options
+   * @returns { Promise<number> } number - The number of items that match the search
+   */
+  async updateOneById<T>(
+    _id: ObjectId | string,
     item: UpdateQuery<T>,
     options: Record<string, unknown> = {},
   ): Promise<T> {
     try {
-      return await this.model.findByIdAndUpdate(_id, item, {
+      const updatedItem = await this.model.findByIdAndUpdate(_id, item, {
         new: true,
         useFindAndModify: false,
         ...options,
       });
+      return updatedItem as T;
     } catch (error) {
       this.serviceLogger.error(error);
       if (error.code === 11000) {
@@ -152,6 +177,15 @@ export abstract class Service<T extends CommonSchema> {
     }
   }
 
+  /**
+   * The constructor must receive the injected model from the child service in
+   * order to provide all the proper base functionality.
+   * @param { T } conditions - The search conditions for the model
+   * @param { string } projection - The projection conditions
+   * for the return value.
+   * @param { Record } options - The return value options
+   * @returns { Promise<number> } number - The number of items that match the search
+   */
   async deleteById(_id: ObjectId | string): Promise<void> {
     const filterQuery = { _id };
     try {
@@ -163,7 +197,17 @@ export abstract class Service<T extends CommonSchema> {
     }
   }
 
-  async deleteSoftById(_id: ObjectId): Promise<void> {
+  /**
+   * The constructor must receive the injected model from the child service in
+   * order to provide all the proper base functionality.
+   * @template { T } Model of the returned value
+   * @param { T } conditions - The search conditions for the model
+   * @param { string } projection - The projection conditions
+   * for the return value.
+   * @param { Record } options - The return value options
+   * @returns { Promise<number> } number - The number of items that match the search
+   */
+  async deleteSoftById(_id: ObjectId | string): Promise<void> {
     try {
       await this.model.findByIdAndUpdate(_id, {
         deleted: true,

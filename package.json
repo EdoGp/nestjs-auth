@@ -2,9 +2,12 @@
   "name": "nestjs-auth",
   "version": "0.0.1",
   "description": "",
-  "author": "",
+  "author": {
+    "name": "Eduardo Gonzalez ",
+    "email": "contact@eduardogonzalez.dev"
+  },
   "private": true,
-  "license": "UNLICENSED",
+  "license": "MIT",
   "scripts": {
     "prebuild": "rimraf dist",
     "build": "nest build",
@@ -30,6 +33,7 @@
     "@nestjs/platform-express": "^9.2.1",
     "@nestjs/serve-static": "^3.0.1",
     "@nestjs/swagger": "^6.2.1",
+    "@sendgrid/mail": "^7.7.0",
     "argon2": "^0.30.2",
     "class-transformer": "^0.5.1",
     "class-validator": "^0.14.0",

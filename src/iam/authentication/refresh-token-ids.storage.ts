@@ -7,6 +7,8 @@ import Redis from 'ioredis';
 
 export class InvalidatedRefreshTokenError extends Error {}
 
+const DAY_IN_SECONDS = 60 * 60 * 24;
+
 @Injectable()
 export class RefreshTokenIdsStorage
   implements OnApplicationBootstrap, OnApplicationShutdown
@@ -25,8 +27,14 @@ export class RefreshTokenIdsStorage
     this.redisClient.quit();
   }
 
-  async insert(userId: string, tokenId: string): Promise<void> {
+  async insert(
+    userId: string,
+    tokenId: string,
+    ttl = Number(process.env.JWT_REFRESH_TOKEN_TTL || DAY_IN_SECONDS),
+  ): Promise<void> {
     await this.redisClient.set(this.getKey(userId), tokenId);
+    const keys = await this.redisClient.keys('*');
+    // console.log('keys', keys);
   }
 
   async validate(userId: string, tokenId: string): Promise<boolean> {
@@ -39,6 +47,10 @@ export class RefreshTokenIdsStorage
 
   async invalidate(userId: string): Promise<void> {
     await this.redisClient.del(this.getKey(userId));
+  }
+
+  async getValue(key: string): Promise<string> {
+    return this.redisClient.get(key);
   }
 
   private getKey(userId: string): string {

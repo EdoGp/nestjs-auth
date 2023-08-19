@@ -30,10 +30,10 @@ export class AuthenticationService {
   constructor(
     @InjectModel(User.name)
     private readonly userModel: Model<User>,
-    private readonly hashingService: HashingService,
-    private readonly jwtService: JwtService,
     @Inject(jwtConfig.KEY)
     private readonly jwtConfiguration: ConfigType<typeof jwtConfig>,
+    private readonly hashingService: HashingService,
+    private readonly jwtService: JwtService,
     private readonly refreshTokenIdsStorage: RefreshTokenIdsStorage,
   ) {}
 
@@ -140,6 +140,40 @@ export class AuthenticationService {
 
   async getProfile(userId: string) {
     return this.userModel.findById(userId, { password: 0, __v: 0 });
+  }
+
+  async passwordRecovery(email: string) {
+    const DAY_IN_SECONDS = 60 * 60 * 24;
+    const user = await this.userModel.findOne({ email });
+    if (!user) {
+      throw new UnauthorizedException('User does not exists');
+    }
+    const token = this.hashingService.generateRandomString();
+    await this.refreshTokenIdsStorage.insert(token, user.id, DAY_IN_SECONDS);
+    // console.log({ token, user, id: user.id });
+    return token;
+  }
+
+  async passwordReset(token: string, password: string) {
+    try {
+      const userId = await this.refreshTokenIdsStorage.getValue(
+        `user-${token}`,
+      );
+      const user = await this.userModel.findOne({
+        _id: userId,
+      });
+      if (!user) {
+        throw new UnauthorizedException('User does not exists');
+      }
+      const hashedPassword = await this.hashingService.hash(password);
+      await this.userModel.findByIdAndUpdate(user.id, {
+        password: hashedPassword,
+        passwordRecoveryToken: null,
+      });
+      await this.refreshTokenIdsStorage.invalidate(token);
+    } catch (error) {
+      // console.log('test', { error });
+    }
   }
 
   private async signToken<T>(userId: string, expiresIn: number, payload?: T) {

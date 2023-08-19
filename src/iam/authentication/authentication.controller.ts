@@ -8,7 +8,8 @@ import {
   Res,
 } from '@nestjs/common';
 import { Response } from 'express';
-import { ActiveUserData } from './../interfaces/active-user-data.interface';
+import { ActiveUserData } from 'src/iam/interfaces/active-user-data.interface';
+import { CommsService } from './../../comms/comms.service';
 import { AuthenticationService } from './authentication.service';
 import { ActiveUser } from './decorators/active-user.decorator';
 import { Auth } from './decorators/auth.decorator';
@@ -21,7 +22,10 @@ import { AuthType } from './enums/auth-type.enum';
 @Auth(AuthType.None)
 @Controller('auth')
 export class AuthenticationController {
-  constructor(private readonly authService: AuthenticationService) {}
+  constructor(
+    private readonly authService: AuthenticationService,
+    private readonly commsService: CommsService,
+  ) {}
 
   @Post('sign-up')
   signUp(@Body() signUpDto: SignUpDto) {
@@ -35,6 +39,11 @@ export class AuthenticationController {
     @Body() signInDto: SignInDto,
   ) {
     const responseTokens = await this.authService.signIn(signInDto);
+    this.commsService.sendMail({
+      to: 'annetudares@gmail.com',
+      subject: 'Mi Amor',
+      text: 'Hola te quiero mucho',
+    });
     // this.authService.setCookieTokens(response, responseTokens);
     return responseTokens;
   }
@@ -43,6 +52,45 @@ export class AuthenticationController {
   @Get('/me')
   async profile(@ActiveUser() { sub: userId }: ActiveUserData) {
     return this.authService.getProfile(userId);
+  }
+
+  @Auth(AuthType.None)
+  @Post('password-recovery')
+  async passwordRecovery(@Body() { email }: { email: string }) {
+    const recoveryToken = await this.authService.passwordRecovery(email);
+    this.commsService.sendMail({
+      to: email,
+      subject: 'Password Recovery Request',
+      html: `
+      <div>
+      <p> Hi,</p>
+      <p>
+      We received a request to reset your password for your account at [redacted].
+      </p>
+      <p>
+      If you did not request this password reset, please disregard this email.
+      </p>
+      <p>
+      To reset your password, please click on the following link:
+      <a href="http://localhost:3000/auth/password-reset?token=${recoveryToken}">Reset password</a>
+      </p>
+      <p>
+      This link will expire in 24 hours.
+      </p>
+      <p>
+      Thank you
+      </p>
+</div>`,
+    });
+    return;
+  }
+
+  @Auth(AuthType.None)
+  @Post('password-reset')
+  async passwordReset(
+    @Body() { password, token }: { password: string; token: string },
+  ) {
+    return this.authService.passwordReset(token, password);
   }
 
   @HttpCode(HttpStatus.OK)

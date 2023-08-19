@@ -15,7 +15,7 @@ export class User extends Document {
   @Prop()
   firstName: string;
 
-  @Prop()
+  @Prop({ default: false })
   isEmailConfirmed: boolean;
 }
 

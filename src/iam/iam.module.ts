@@ -3,6 +3,7 @@ import { ConfigModule } from '@nestjs/config';
 import { APP_GUARD } from '@nestjs/core';
 import { JwtModule } from '@nestjs/jwt';
 import { MongooseModule } from '@nestjs/mongoose';
+import { CommsModule } from './../comms/comms.module';
 import { User, UserSchema } from './../users/entities/user.entity';
 import { AuthenticationController } from './authentication/authentication.controller';
 import { AuthenticationService } from './authentication/authentication.service';
@@ -24,6 +25,7 @@ import { HashingService } from './hashing/hashing.service';
     ]),
     JwtModule.registerAsync(jwtConfig.asProvider()),
     ConfigModule.forFeature(jwtConfig),
+    CommsModule,
   ],
   providers: [
     { provide: HashingService, useClass: Argon2Service },
