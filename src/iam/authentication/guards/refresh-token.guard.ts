@@ -44,7 +44,6 @@ export class RefreshTokenGuard implements CanActivate {
     });
     const refreshToken = refreshTokenCookie?.split('=')[1];
     const [_, token] = request.headers.authorization?.split(' ') ?? [];
-    console.log({ refreshToken, token, refreshTokenCookie });
     return refreshToken || token;
   }
 }
