@@ -7,6 +7,7 @@ import { CommsModule } from './comms/comms.module';
 
 import { IamModule } from './iam/iam.module';
 import { UsersModule } from './users/users.module';
+import { PermissionsModule } from './permissions/permissions.module';
 
 @Module({
   imports: [
@@ -15,6 +16,7 @@ import { UsersModule } from './users/users.module';
     IamModule,
     MongooseModule.forRoot(process.env.MONGO_URL),
     CommsModule,
+    PermissionsModule,
   ],
   controllers: [AppController],
   providers: [AppService],
