@@ -6,6 +6,10 @@
     "name": "Eduardo Gonzalez ",
     "email": "contact@eduardogonzalez.dev"
   },
+  "packageManager": "yarn@4.0.0",
+  "engines": {
+    "node": ">=20.9.0"
+  },
   "private": true,
   "license": "MIT",
   "scripts": {
@@ -85,8 +89,5 @@
     ],
     "coverageDirectory": "../coverage",
     "testEnvironment": "node"
-  },
-  "engines": {
-    "node": ">=18.13.0"
   }
 }
